@@ -1,0 +1,366 @@
+
+#include <iostream>
+#include <string>
+using namespace std;
+
+class Movie
+{
+private:
+	string movie_name;
+	int tickets_available;
+	int ticket_price;
+public:
+	Movie();
+	Movie(string my_movie_name, int my_tickets_available, int my_ticket_price);
+	~Movie();
+
+	string get_movie_name();
+	int get_tickets_available();
+	int get_ticket_price();
+	void set_movie_name(string new_movie_name);
+	void set_tickets_available(int new_tickets_available);
+	void set_ticket_price(int new_ticket_price);
+
+	double PurchaseTicket(int new_tickets_available);
+	void Display();
+};
+
+
+class MovieTicketMaster
+{
+private:
+	Movie * p_MovieList;
+	string theater_name;
+	string theater_location;
+public:
+	MovieTicketMaster();
+	MovieTicketMaster(string my_theater_name, string my_theater_location);
+	~MovieTicketMaster();
+	void Init(Movie * p_my_MovieList, int array_size);
+	void Run();
+	void DisplayMenu();
+	void ViewMovies();
+	Movie * SearchMovie();
+	Movie * FindMovie(string find_movie_name);
+	void PurchaseTicket();
+};
+const int g_kArraySize = 8;				// SO LUONG phim co tai rap chieu  
+int main ()
+{
+	Movie movie_objects[g_kArraySize];
+
+	MovieTicketMaster * p_MovieTicketMaster = new MovieTicketMaster ("HHP","TBP, NNK");
+	p_MovieTicketMaster->Init(movie_objects, g_kArraySize);
+	p_MovieTicketMaster->Run();
+
+	delete p_MovieTicketMaster;
+	return 0;
+}
+
+// Constructor mac dinh thiet lap con tro thanh NULL 
+
+MovieTicketMaster::MovieTicketMaster()
+{
+	p_MovieList =NULL;
+}
+
+// không mac dinh nhan tham so de thiet lap 
+// ten rap va dia diem van dang khoi tao 
+
+MovieTicketMaster::MovieTicketMaster(string my_theater_name, string my_theater_location)
+{
+	theater_name = my_theater_name;
+	theater_location = my_theater_location;
+	p_MovieList = NULL;
+}
+
+// 
+MovieTicketMaster::~MovieTicketMaster()
+{
+	cout << "Theater " << theater_name << ",Location " << theater_location 
+		<< " has been closed.." << endl;
+}
+
+// ban dau dang duoc khoi tao 
+
+void MovieTicketMaster::Init(Movie * p_my_MovieList, int array_size)
+{
+	string movie_titles[g_kArraySize] = 
+	{"John Wick",
+		"Bad Boys for Life",
+		"Black Adam",
+		"Spider-Man: No Way Home",
+		"The King’s Man",
+		"Top Gun: Maverick",
+		"Bullet Train",
+		"Mission Impossible"};
+
+	int theater_tickets[g_kArraySize] = {100,75,90,90,75,115,120,130};
+
+	int movie_price[g_kArraySize] = {50000,60000,55000,70000,60000,100000,70000,65000};
+
+	Movie * p = p_my_MovieList;
+
+	for(int i=0;i <= g_kArraySize - 1;i++){
+		p->set_movie_name(movie_titles[i]);
+		p->set_tickets_available(theater_tickets[i]);
+		p->set_ticket_price(movie_price[i]);
+		p++;
+	}
+
+	p_MovieList = p_my_MovieList;
+
+}
+
+// yeu cau nguoi dung vhon bang vong vong lap do. while  
+
+void MovieTicketMaster::Run()
+{
+	int option;
+
+	do{
+
+		DisplayMenu();
+
+		cout << endl << "\t\t\t\tPlease select an option: ";
+
+		cin >> option;
+
+		switch (option)
+		{
+
+		case 1:
+			ViewMovies();
+			system("PAUSE");
+			system("CLS");
+			break;
+
+		case 2:
+
+			SearchMovie();
+			system("PAUSE");
+			system("CLS");
+			break;
+
+		case 3:
+
+			PurchaseTicket();
+			break;
+
+		case 4:
+			
+			cout <<"Thank you for your attention !" << endl;
+			break;
+			
+		default:
+
+			cout <<"Please choose a valid option:" << endl
+				<< "=============================" << endl;
+			cin.ignore();
+
+		}
+	}
+	while (option != 4);
+}
+
+// hien thi ten, dia diem va lua chon cua khach hang 
+void MovieTicketMaster::DisplayMenu()
+{
+
+		cout<<"\t\t\t\tTheater: " << theater_name << " at " << theater_location << endl
+		<< endl <<"\t\t\t\t  *********************  " << endl
+		<<"\t\t\t\t||     WELCOME   TO      ||" << endl
+		<<"\t\t\t\t||            THE BOYS      ||" << endl
+		<<"\t\t\t\t  *********************  " << endl << endl
+		<<"\t\t\t\tSimple Movie Theater System" << endl
+		<<"\t\t\t\t===========================" << endl
+		<<"\t\t\t\t\tMAIN MENU: " << endl
+		<<"\t\t\t\t1--> View all movies" << endl
+		<<"\t\t\t\t2--> Search a movie" << endl
+		<<"\t\t\t\t3--> Purchase tickets" << endl
+		<<"\t\t\t\t4--> Quit" << endl;
+	
+}
+
+// hien thi cac thong tin cua phim ( ten phim , so ve con lai va gia ) 
+void MovieTicketMaster::ViewMovies()
+{
+
+	Movie * p_view_movies = p_MovieList;
+    system("CLS");
+	cout << endl
+		<<"Here are the movies that are showing " << endl
+		<<"at THE BOYS:" << endl
+		<<"=========================" << endl << endl;
+
+	for (int i = 0; i < g_kArraySize; i++){
+		cout << "Movie showing at theater "  << i + 1  << ": " << endl;
+		p_view_movies->Display();
+		++p_view_movies;
+	}
+}
+
+// dong nay yeu cau nguoi dung nhap ten Phim, sau dó dung FindMovie 
+//  lay con tro , sau do hien thi doi tuong, c-p 
+
+Movie * MovieTicketMaster::SearchMovie()
+{
+	string search_movie_name;
+	
+	cout << "\n\t\t\t\tPlease enter a movie name: ";
+	cin.sync();
+	std::getline(std::cin, search_movie_name);
+
+	Movie * p = FindMovie(search_movie_name);
+
+	if (p != NULL){
+		p->Display();
+	} 
+	else {
+		cout << endl << "\n\t\t\t\tError: Movie not found." << endl << endl;
+		return NULL;
+	}
+	return p;
+}
+
+// dong nay su dung vong lap for de tim kiem ten cac doi tuong 
+// sau do su dung vong lap if de khop chung va tra ve mot con tro quay lai doi tuong 
+
+Movie * MovieTicketMaster::FindMovie(string find_movie_name)
+{
+
+	Movie * p_find_movie = p_MovieList;
+	for (int i = 0; i < g_kArraySize; i++){
+		if (p_find_movie->get_movie_name() == find_movie_name){
+			cout << endl << "\n\t\t\t\tMovie found" << endl;
+			return p_find_movie;
+		}
+		else {
+			p_find_movie++;
+		}
+	}
+	return NULL;
+}
+
+// dong nay cho phep nguoi dung mua mot so luoneg ve nhat dinh 
+// bang cach su dung con tro duoc tra ve tu dong FindMove 
+
+void MovieTicketMaster::PurchaseTicket()
+{
+	string purchase_movie_name;
+
+	int total_tickets;
+    system("CLS");
+	cout << "\n\n\t\t\t\tPlease enter a movie name: ";
+	cin.sync();
+	std::getline(std::cin, purchase_movie_name);
+
+	cout << "\n\t\t\t\tPlease enter the total amount of tickets you wish to purchase: ";
+	cin >> total_tickets;
+
+	Movie * p = FindMovie(purchase_movie_name);
+
+		if (p != NULL){
+		int total_cost =	p-> PurchaseTicket(total_tickets); 
+				if ( total_cost == -1){
+					cout << "\n\t\t\t\tThis movie has been sold out or there are" << endl
+						<< "\n\t\t\t\tnot enough tickets available per your request" << endl << endl;
+				} 
+				else {
+					cout << "\n\t\t\t\tYour total comes out to: " << total_cost << endl;
+				}
+				cout<<"\n\n\n\n\t\t\t\t";
+				system("PAUSE");
+				system("CLS");
+		} 
+		else {
+			cout << "No movie has been found" << endl;
+		}
+		
+}
+
+
+Movie::Movie()
+{
+	movie_name = "";
+	tickets_available = 0;
+	ticket_price = 0.0;
+}
+
+
+Movie::Movie(string my_movie_name, int my_tickets_available,int my_ticket_price)
+{
+	movie_name = my_movie_name;
+	tickets_available = my_tickets_available;
+	ticket_price = my_ticket_price;
+}
+
+
+Movie::~Movie()
+{
+	cout << movie_name << " is no longer showing.." << endl;
+}
+
+
+string Movie::get_movie_name()
+{
+	return movie_name;
+}
+
+
+int Movie::get_tickets_available()
+{
+	return tickets_available;
+}
+
+
+int Movie::get_ticket_price()
+{
+	return ticket_price;
+}
+
+
+void Movie::set_movie_name(string new_movie_name)
+{
+	movie_name = new_movie_name;
+}
+
+
+void Movie::set_tickets_available(int new_tickets_available)
+{
+	tickets_available = new_tickets_available;
+}
+
+
+void Movie::set_ticket_price(int new_ticket_price)
+{
+	ticket_price = new_ticket_price;
+}
+
+// dong nay su dung so ve ma nguoi dung muon de tinh tong so ve cua ho 
+
+double Movie::PurchaseTicket(int purchase_tickets_available)
+{
+	int total_price;
+
+	if (purchase_tickets_available <= tickets_available) {
+		total_price = purchase_tickets_available * ticket_price;
+		tickets_available = tickets_available - purchase_tickets_available;
+		return total_price;
+	} else {
+		return -1;
+	}
+}
+
+// dong nay hien thi ca ba khia canh cua doi tuong phim 
+
+void Movie::Display()
+{
+		cout.setf(ios::fixed, ios::floatfield); 
+		cout.setf(ios::showpoint); 
+		cout.precision(2);
+		cout << endl << "\t\t\t\tMovie name: " << movie_name << endl
+			<<"\n\t\t\t\tTickets available: " << tickets_available << endl
+			<<"\n\t\t\t\tPrice per ticket: "<< ticket_price << endl << endl;
+		
+}
